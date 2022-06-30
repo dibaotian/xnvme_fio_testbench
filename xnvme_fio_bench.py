@@ -393,12 +393,10 @@ def fio_3x_result_format(data,job_id):
                         result.append(data['global options']['bs'])
                     else:
                         result.append("")
-
                     result.append(data['jobs'][int(job)+int(thread)]['job options']['filename'])
 
 
                 elif rw_type == 'rw' or rw_type == 'randrw':
-                    print('read and write')
                     # result.append(data['jobs'][int(job)+int(thread)]['job options']['rw']+'_'+str(job)+'_'+str(thread))
                     if data['jobs'][int(job)+int(thread)]['job options']['rw'] == 'randrw':
                         result.append('randread'+'_'+str(job)+'_'+str(thread))
@@ -550,8 +548,14 @@ def do_all_fio_jobs(fio_filename,fio_size,fio_runtime):
          files= os.listdir(PATH)
          for each_file in files:
              do_fio_job(each_file,fio_filename,fio_size,fio_runtime)
+     except Exception as e:
+         print ('counter exception: {}'.format(str(e)))
 
-
+def do_group_fio_jobs(group_path):
+     try:
+         files= os.listdir(group_path)
+         for each_file in files:
+             do_fio_job(each_file)
      except Exception as e:
          print ('counter exception: {}'.format(str(e)))
 
@@ -564,6 +568,7 @@ def main():
     parser.add_argument('-p','--printjobs', action="store_true",help='print job')
 
     parser.add_argument('-j','--job_id',help='job id')
+    parser.add_argument('-g','--group_id',help='group id')
     parser.add_argument('-t','--runtime_of_each_job',help='run_time_of_each_job')
     parser.add_argument('-d','--destination',
                         help='filename parameter in fio, for iscsi it is a device like /dev/sdx, for nas it is directory')
@@ -603,8 +608,13 @@ def main():
         do_fio_job(options.job_id, fio_runtime=options.runtime_of_each_job)
         return
 
+    if options.group_id:
+        print("执行一组用例")
+        print(options.group_id)
+        do_group_fio_jobs(options.group_id)
+        return
+
     if  options.destination and options.size and options.runtime_of_each_job:
-       
         if not options.job_id:
             do_all_fio_jobs(options.destination,options.size,options.runtime_of_each_job)
 

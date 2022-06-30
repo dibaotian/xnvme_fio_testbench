@@ -1,4 +1,4 @@
-# seq_write_18jobs_iodep8_multinvmedisk
+# seq_write_bs4k_iodep8_18jobs_multinvmedisk
 [global]
 bs=4k
 iodepth=8
