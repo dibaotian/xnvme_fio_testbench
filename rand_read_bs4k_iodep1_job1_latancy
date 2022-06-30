@@ -1,28 +1,16 @@
 [global]
-bs=4k
-iodepth=16
 direct=1
 ioengine=libaio
 randrepeat=0
-#group_reporting
+bs=4k
+iodepth=1
+size=100%
+#group_reporting=1
 time_based
 runtime=5
-size=100%
 
 [job1]
 rw=randread
-bs=8k
 numjobs=1
 filename=/dev/nvme0n1
-
-[job2]
-rw=randwrite
-numjobs=1
-filename=/dev/nvme1n1
-
-
-
-
-
-
-
+# name=raw=seq-read-pf1

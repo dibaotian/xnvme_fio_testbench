@@ -59,7 +59,7 @@ def run_fio_conf(job_id=None,filename=None,fio_size=None,fio_runtime=None):
     output=subprocess.getoutput("cp -r {}/{} {}".format(PATH,job_id,RUN_PATH))
 
     file='{}/{}'.format(RUN_PATH,job_id)
-    print(file)
+    # print(file)
 
     try:
         with open(file,'r') as f:
@@ -141,12 +141,14 @@ def do_fio_job(job_id,filename=None,fio_size=None,fio_runtime=None):
         else:
             print ('fio version is not expected')
     except Exception as e:
-         print ('do_fio_job exception: {}'.format(str(e)))
+        print(data)
+        print ('do_fio_job exception: {}'.format(str(e)))
+         
 
 
 
 def print_header(header):
-    print ('\n')
+    # print ('\n')
     print ('=========  result of {}  =========      '.format(header))
     #print '------------------------------------------------------------------'
     #print 'type               |iops              |bandwidth                  '
@@ -154,125 +156,331 @@ def print_header(header):
 
 
 def fio_3x_result_format(data,job_id):
-    # result={}
-    # result['type']=''
 
-    # print(data)
-    # print(data['global options'])
     conf_job_cnt = get_fio_conf_jobs(job_id)
     conf_job_cnt = conf_job_cnt -1  # 去掉global 的配置
-    print("conf_job_cnt: {}".format(conf_job_cnt))
+    # print("conf_job_cnt: {}".format(conf_job_cnt))
 
     time = data['time']
-    print("test time: {}".format(time))
+    print("========= run time: {}=======".format(time))
 
     result = []
     result_sum = []
 
     numjobs_offset = 0
 
-    for job in range(0, conf_job_cnt):
+    if 'group_reporting' in data['global options'].keys():
+        print("group reporting")
+        # print(data)
 
-        print("job{}".format(job))
+        rw_type = data['jobs'][0]['job options']['rw']
 
-        # 每个conf_job 提取本次的numjobs, 用于下一次conf_job的偏移
-        if 'numjobs' in data['jobs'][int(numjobs_offset)]['job options'].keys():
-            numjobs = data['jobs'][int(numjobs_offset)]['job options']['numjobs']
-        else:
-            numjobs = 1
-        print("numjobs : {}".format(numjobs))
-        numjobs_offset = numjobs_offset + int(numjobs)
-        print("numjobs_offset", numjobs_offset)
+        if rw_type == 'read' or rw_type == 'randread':
+            result.append(data['jobs'][0]['job options']['rw'])
+            result.append(data['jobs'][0]['read']['iops'])
+            result.append(data['jobs'][0]['read']['bw'])
+            result.append(data['jobs'][0]['read']['lat_ns']['mean']/1000/1000)
+            result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["90.000000"]/1000/1000)
+            result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["95.000000"]/1000/1000)
+            result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["99.000000"]/1000/1000)
+            result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["99.900000"]/1000/1000)
 
-        # 读取每个conf_job 的numjobs 的最后一个
-        rw_type = data['jobs'][int(numjobs_offset)-1]['job options']['rw']
-       
-
-        for thread in range(0, int(numjobs)):
-            if rw_type == 'read' or rw_type == 'randread':
-
-                result.append(data['jobs'][int(job)+int(thread)]['job options']['rw'])
-                result.append(data['jobs'][int(job)+int(thread)]['read']['iops'])
-                result.append(data['jobs'][int(job)+int(thread)]['read']['bw'])
-                result.append(data['jobs'][int(job)+int(thread)]['read']['lat_ns']['mean']/1000/1000)
-                result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["90.000000"]/1000/1000)
-                result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["95.000000"]/1000/1000)
-                result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["99.000000"]/1000/1000)
-                result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["99.900000"]/1000/1000)
-
-                if 'iodepth' in data['jobs'][int(job)+int(thread)]['job options'].keys():
-                    # print(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
-                    result.append(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
-                elif 'iodepth' in data['global options'].keys():
-                    result.append(data['global options']['iodepth'])
-                else:
-                    result.append("")
-
-                if 'bs' in data['jobs'][int(job)+int(thread)]['job options'].keys():
-                    # print(data['jobs'][int(job)+int(thread)]['job options']['bs'])
-                    result.append(data['jobs'][int(job)+int(thread)]['job options']['bs'])
-                elif 'bs' in data['global options'].keys():
-                    result.append(data['global options']['bs'])
-                else:
-                    result.append("")
-
-                result.append(data['jobs'][int(job)+int(thread)]['job options']['filename'])
-
-            elif rw_type == 'write' or rw_type == 'randwrite':
-                result.append(rw_type)
-                result.append(data['jobs'][int(job)+int(thread)]['write']['iops'])
-                result.append(data['jobs'][int(job)+int(thread)]['write']['bw'])
-                result.append(data['jobs'][int(job)+int(thread)]['write']['lat_ns']['mean']/1000/1000)
-                result.append(data['jobs'][int(job)+int(thread)]['write']['clat_ns']["percentile"]["90.000000"]/1000/1000)
-                result.append(data['jobs'][int(job)+int(thread)]['write']['clat_ns']["percentile"]["95.000000"]/1000/1000)
-                result.append(data['jobs'][int(job)+int(thread)]['write']['clat_ns']["percentile"]["99.000000"]/1000/1000)
-                result.append(data['jobs'][int(job)+int(thread)]['write']['clat_ns']["percentile"]["99.900000"]/1000/1000)
-
-                
-                if 'iodepth' in data['jobs'][int(job)+int(thread)]['job options'].keys():
-                    print('get iodepth')
-                    print(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
-                    result.append(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
-                elif 'iodepth' in data['global options'].keys():
-                    result.append(data['global options']['iodepth'])
-                else:
-                    result.append("")
-
-                if 'bs' in data['jobs'][int(job)+int(thread)]['job options'].keys():
-                    print(data['jobs'][int(job)+int(thread)]['job options']['bs'])
-                    result.append(data['jobs'][int(job)+int(thread)]['job options']['bs'])
-                elif 'bs' in data['global options'].keys():
-                    result.append(data['global options']['bs'])
-                else:
-                    result.append("")
-
-                result.append(data['jobs'][int(job)+int(thread)]['job options']['filename'])
-
-
-            elif rw_type == 'rw' or rw_type == 'randrw':
-                print('read and write')
+            if 'iodepth' in data['jobs'][0]['job options'].keys():
+                result.append(data['jobs'][0]['job options']['iodepth'])
+            elif 'iodepth' in data['global options'].keys():
+                result.append(data['global options']['iodepth'])
             else:
-                print("does not match")
-            
+                result.append("")
+
+            if 'bs' in data['jobs'][0]['job options'].keys():
+                # print(data['jobs'][int(job)+int(thread)]['job options']['bs'])
+                result.append(data['jobs'][0]['job options']['bs'])
+            elif 'bs' in data['global options'].keys():
+                result.append(data['global options']['bs'])
+            else:
+                result.append("")
+
+            result.append(data['jobs'][0]['job options']['filename'])
+
+            if 'numjobs' in data['jobs'][0]['job options'].keys():
+                result.append(data['jobs'][0]['job options']['numjobs']+ ' threads')
+            elif 'numjobs' in data['global options'].keys():
+                result.append(data['global options']['numjobs'] +' threads')
+            else:
+                result.append("1")
+
+        elif rw_type == 'write' or rw_type == 'randwrite':
+            print("write")
+            result.append(data['jobs'][0]['job options']['rw'])
+            result.append(data['jobs'][0]['write']['iops'])
+            result.append(data['jobs'][0]['write']['bw'])
+            result.append(data['jobs'][0]['write']['lat_ns']['mean']/1000/1000)
+            result.append(data['jobs'][0]['write']['clat_ns']["percentile"]["90.000000"]/1000/1000)
+            result.append(data['jobs'][0]['write']['clat_ns']["percentile"]["95.000000"]/1000/1000)
+            result.append(data['jobs'][0]['write']['clat_ns']["percentile"]["99.000000"]/1000/1000)
+            result.append(data['jobs'][0]['write']['clat_ns']["percentile"]["99.900000"]/1000/1000)
+   
+            if 'iodepth' in data['jobs'][0]['job options'].keys():
+                print('get iodepth')
+                print(data['jobs'][0]['job options']['iodepth'])
+                result.append(data['jobs'][0]['job options']['iodepth'])
+            elif 'iodepth' in data['global options'].keys():
+                result.append(data['global options']['iodepth'])
+            else:
+                result.append("")
+
+            if 'bs' in data['jobs'][0]['job options'].keys():
+                print(data['jobs'][0]['job options']['bs'])
+                result.append(data['jobs'][0]['job options']['bs'])
+            elif 'bs' in data['global options'].keys():
+                result.append(data['global options']['bs'])
+            else:
+                result.append("")
+
+            result.append(data['jobs'][0]['job options']['filename'])
+
+            if 'numjobs' in data['jobs'][0]['job options'].keys():
+                result.append(data['jobs'][0]['job options']['numjobs']+ ' threads')
+            elif 'numjobs' in data['global options'].keys():
+                result.append(data['global options']['numjobs'] +' threads')
+            else:
+                result.append("1")
+        elif rw_type == 'rw' or rw_type == 'randrw':
+            print('randrw')
+            if data['jobs'][0]['job options']['rw'] == 'randrw':
+                result.append('randread')
+            else:
+                result.append('read')
+            result.append(data['jobs'][0]['read']['iops'])
+            result.append(data['jobs'][0]['read']['bw'])
+            result.append(data['jobs'][0]['read']['lat_ns']['mean']/1000/1000)
+            result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["90.000000"]/1000/1000)
+            result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["95.000000"]/1000/1000)
+            result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["99.000000"]/1000/1000)
+            result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["99.900000"]/1000/1000)
+
+            if 'iodepth' in data['jobs'][0]['job options'].keys():
+                # print(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
+                result.append(data['jobs'][0]['job options']['iodepth'])
+            elif 'iodepth' in data['global options'].keys():
+                result.append(data['global options']['iodepth'])
+            else:
+                result.append("")
+
+            if 'bs' in data['jobs'][0]['job options'].keys():
+                # print(data['jobs'][int(job)+int(thread)]['job options']['bs'])
+                result.append(data['jobs'][0]['job options']['bs'])
+            elif 'bs' in data['global options'].keys():
+                result.append(data['global options']['bs'])
+            else:
+                result.append("")
+
+            result.append(data['jobs'][0]['job options']['filename'])
+
             result_sum.append(result)
             result = []
-        # match rw_type:
-        #     case 'read':
-        #         print('read')
-        #     case 'write':
-        #         print('read')
-        #     case 'randread':
-        #         print('randread')
-        #     case 'randwrite':
-        #         print('randwrite')
-        #     case 'randrw'
-        #         print('randrw')
-        #     case _:
-        #         print("could not found")
-    print(result_sum)
+
+            if data['jobs'][0]['job options']['rw'] == 'randrw':
+                result.append('randwrite')
+            else:
+                result.append('write')
+            # result.append(data['jobs'][int(job)+int(thread)]['job options']['rw']+'_'+str(job)+'_'+str(thread))
+            result.append(data['jobs'][0]['write']['iops'])
+            result.append(data['jobs'][0]['write']['bw'])
+            result.append(data['jobs'][0]['write']['lat_ns']['mean']/1000/1000)
+            result.append(data['jobs'][0]['write']['clat_ns']["percentile"]["90.000000"]/1000/1000)
+            result.append(data['jobs'][0]['write']['clat_ns']["percentile"]["95.000000"]/1000/1000)
+            result.append(data['jobs'][0]['write']['clat_ns']["percentile"]["99.000000"]/1000/1000)
+            result.append(data['jobs'][0]['write']['clat_ns']["percentile"]["99.900000"]/1000/1000)
+
+            
+            if 'iodepth' in data['jobs'][0]['job options'].keys():
+                print('get iodepth')
+                print(data['jobs'][0]['job options']['iodepth'])
+                result.append(data['jobs'][0]['job options']['iodepth'])
+            elif 'iodepth' in data['global options'].keys():
+                result.append(data['global options']['iodepth'])
+            else:
+                result.append("")
+
+            if 'bs' in data['jobs'][0]['job options'].keys():
+                print(data['jobs'][0]['job options']['bs'])
+                result.append(data['jobs'][0]['job options']['bs'])
+            elif 'bs' in data['global options'].keys():
+                result.append(data['global options']['bs'])
+            else:
+                result.append("")
+
+            result.append(data['jobs'][0]['job options']['filename'])
+        else:
+            print("does not match")
+
+        result_sum.append(result)
+        result = []
+    else:
+        conf_job_cnt = get_fio_conf_jobs(job_id)
+        conf_job_cnt = conf_job_cnt -1  # 去掉global 的配置
+        # print("conf_job_cnt: {}".format(conf_job_cnt))
+
+        for job in range(0, conf_job_cnt):
+            # print("job{}".format(job))
+            # 每个conf_job 提取本次的numjobs, 用于下一次conf_job的偏移
+            if 'numjobs' in data['jobs'][int(numjobs_offset)]['job options'].keys():
+                numjobs = data['jobs'][int(numjobs_offset)]['job options']['numjobs']
+            else:
+                numjobs = 1
+            # print("numjobs : {}".format(numjobs))
+            numjobs_offset = numjobs_offset + int(numjobs)
+            # print("numjobs_offset", numjobs_offset)
+
+            # 读取每个conf_job 的numjobs 的最后一个
+            rw_type = data['jobs'][int(numjobs_offset)-1]['job options']['rw']
+        
+            for thread in range(0, int(numjobs)):
+                if rw_type == 'read' or rw_type == 'randread':
+                    result.append(data['jobs'][int(job)+int(thread)]['job options']['rw']+'_'+str(job)+'_'+str(thread))
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['iops'])
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['bw'])
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['lat_ns']['mean']/1000/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["90.000000"]/1000/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["95.000000"]/1000/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["99.000000"]/1000/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["99.900000"]/1000/1000)
+
+                    if 'iodepth' in data['jobs'][int(job)+int(thread)]['job options'].keys():
+                        # print(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
+                        result.append(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
+                    elif 'iodepth' in data['global options'].keys():
+                        result.append(data['global options']['iodepth'])
+                    else:
+                        result.append("")
+
+                    if 'bs' in data['jobs'][int(job)+int(thread)]['job options'].keys():
+                        # print(data['jobs'][int(job)+int(thread)]['job options']['bs'])
+                        result.append(data['jobs'][int(job)+int(thread)]['job options']['bs'])
+                    elif 'bs' in data['global options'].keys():
+                        result.append(data['global options']['bs'])
+                    else:
+                        result.append("")
+
+                    result.append(data['jobs'][int(job)+int(thread)]['job options']['filename'])
+
+                elif rw_type == 'write' or rw_type == 'randwrite':
+                    # result.append(rw_type +job+'_'+thread))
+                    result.append(data['jobs'][int(job)+int(thread)]['job options']['rw']+'_'+str(job)+'_'+str(thread))
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['iops'])
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['bw'])
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['lat_ns']['mean']/1000/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['clat_ns']["percentile"]["90.000000"]/1000/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['clat_ns']["percentile"]["95.000000"]/1000/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['clat_ns']["percentile"]["99.000000"]/1000/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['clat_ns']["percentile"]["99.900000"]/1000/1000)
+
+                    
+                    if 'iodepth' in data['jobs'][int(job)+int(thread)]['job options'].keys():
+                        print('get iodepth')
+                        print(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
+                        result.append(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
+                    elif 'iodepth' in data['global options'].keys():
+                        result.append(data['global options']['iodepth'])
+                    else:
+                        result.append("")
+
+                    if 'bs' in data['jobs'][int(job)+int(thread)]['job options'].keys():
+                        print(data['jobs'][int(job)+int(thread)]['job options']['bs'])
+                        result.append(data['jobs'][int(job)+int(thread)]['job options']['bs'])
+                    elif 'bs' in data['global options'].keys():
+                        result.append(data['global options']['bs'])
+                    else:
+                        result.append("")
+
+                    result.append(data['jobs'][int(job)+int(thread)]['job options']['filename'])
+
+
+                elif rw_type == 'rw' or rw_type == 'randrw':
+                    print('read and write')
+                    # result.append(data['jobs'][int(job)+int(thread)]['job options']['rw']+'_'+str(job)+'_'+str(thread))
+                    if data['jobs'][int(job)+int(thread)]['job options']['rw'] == 'randrw':
+                        result.append('randread'+'_'+str(job)+'_'+str(thread))
+                    else:
+                        result.append('read'+'_'+str(job)+'_'+str(thread))
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['iops'])
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['bw'])
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['lat_ns']['mean']/1000/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["90.000000"]/1000/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["95.000000"]/1000/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["99.000000"]/1000/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["99.900000"]/1000/1000)
+
+                    if 'iodepth' in data['jobs'][int(job)+int(thread)]['job options'].keys():
+                        # print(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
+                        result.append(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
+                    elif 'iodepth' in data['global options'].keys():
+                        result.append(data['global options']['iodepth'])
+                    else:
+                        result.append("")
+
+                    if 'bs' in data['jobs'][int(job)+int(thread)]['job options'].keys():
+                        # print(data['jobs'][int(job)+int(thread)]['job options']['bs'])
+                        result.append(data['jobs'][int(job)+int(thread)]['job options']['bs'])
+                    elif 'bs' in data['global options'].keys():
+                        result.append(data['global options']['bs'])
+                    else:
+                        result.append("")
+
+                    result.append(data['jobs'][int(job)+int(thread)]['job options']['filename'])
+
+                    result_sum.append(result)
+                    result = []
+
+                    if data['jobs'][int(job)+int(thread)]['job options']['rw'] == 'randrw':
+                        result.append('randwrite'+'_'+str(job)+'_'+str(thread))
+                    else:
+                        result.append('write'+'_'+str(job)+'_'+str(thread))
+                    # result.append(data['jobs'][int(job)+int(thread)]['job options']['rw']+'_'+str(job)+'_'+str(thread))
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['iops'])
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['bw'])
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['lat_ns']['mean']/1000/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['clat_ns']["percentile"]["90.000000"]/1000/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['clat_ns']["percentile"]["95.000000"]/1000/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['clat_ns']["percentile"]["99.000000"]/1000/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['clat_ns']["percentile"]["99.900000"]/1000/1000)
+
+                    
+                    if 'iodepth' in data['jobs'][int(job)+int(thread)]['job options'].keys():
+                        print('get iodepth')
+                        print(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
+                        result.append(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
+                    elif 'iodepth' in data['global options'].keys():
+                        result.append(data['global options']['iodepth'])
+                    else:
+                        result.append("")
+
+                    if 'bs' in data['jobs'][int(job)+int(thread)]['job options'].keys():
+                        print(data['jobs'][int(job)+int(thread)]['job options']['bs'])
+                        result.append(data['jobs'][int(job)+int(thread)]['job options']['bs'])
+                    elif 'bs' in data['global options'].keys():
+                        result.append(data['global options']['bs'])
+                    else:
+                        result.append("")
+
+                    result.append(data['jobs'][int(job)+int(thread)]['job options']['filename'])
+
+
+
+
+                else:
+                    print("does not match")
+                
+                result_sum.append(result)
+                result = []
+
+    # print(result_sum)
+
+    print_header(job_id)
 
     print(tabulate(result_sum, 
-        headers=['type', 'iops','bandwidth(MB)','latency_avg(ms)','latency_90%','latency_95%','latency_99%','latency_99.9%','iodepth','blk size', 'device'], 
+        headers=['type', 'iops','bandwidth(MB)','latency_avg(ms)','latency_90%','latency_95%','latency_99%','latency_99.9%','iodepth','blk size', 'device', 'group'], 
         tablefmt='orgtbl'))
     
     # rw_type=job_id.split('_')[1]
@@ -380,17 +588,20 @@ def main():
         do_fio_job(options.job_id,options.destination,options.size,options.runtime_of_each_job)
     
     if options.job_id:
-        print("运行指定测试用例")
-        do_fio_job(options.job_id)
+        if not options.runtime_of_each_job and not options.destination:
+            print("运行指定测试用例{}".format(options.job_id))
+            do_fio_job(options.job_id)
 
     # def do_fio_job(job_id,filename=None,fio_size=None,fio_runtime=None):
     if options.job_id and options.destination:
-        print("指定测试用例，并且指定NVME Disk")
+        print("指定测试用例{}，指定NVME盘{}".format(options.job_id,options.destination))
         do_fio_job(options.job_id, filename=options.destination)
+        return 
         
-    if options.runtime_of_each_job and options.runtime_of_each_job:
-        print("指定测试用例，并且指定执行时间")
+    if options.job_id and options.runtime_of_each_job:
+        print("指定测试用例{}，指定运行时间{}".format(options.job_id, options.runtime_of_each_job))
         do_fio_job(options.job_id, fio_runtime=options.runtime_of_each_job)
+        return
 
     if  options.destination and options.size and options.runtime_of_each_job:
        
@@ -406,5 +617,7 @@ if __name__ == '__main__':
         sys.exit(1)
     else:
         main()
-        print("####Finish####")
+        print("\n")
+        print("####   Complete   ####")
+        print("\n")
         sys.exit(0)

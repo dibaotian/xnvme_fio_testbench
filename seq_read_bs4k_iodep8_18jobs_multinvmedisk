@@ -1,16 +1,19 @@
+# seq_read_bs4k_iodep8_18jobs_multinvmedisk
 [global]
 bs=4k
 iodepth=8
-direct=1
+#direct=1
 ioengine=libaio
 randrepeat=0
-#group_reporting
+# group_reporting
 time_based
-runtime=10
+runtime=5
 size=100%
+
 
 [job1]
 rw=read
+numjobs=2
 filename=/dev/nvme0n1
 name=raw=seq-read-pf1
 
@@ -21,76 +24,77 @@ name=raw=seq-read-pf2
 
 [job3]
 rw=read
-filename=/dev/nvme3n1
+filename=/dev/nvme2n1
 name=raw=seq-read-1vf1
 
 [job4]
 rw=read
-filename=/dev/nvme4n1
+filename=/dev/nvme3n1
 name=raw=seq-read-1vf2
 
 [job5]
 rw=read
-filename=/dev/nvme5n1
+filename=/dev/nvme4n1
 name=raw=seq-read-1vf3
 
 [job6]
 rw=read
-filename=/dev/nvme6n1
+filename=/dev/nvme5n1
 name=raw=seq-read-1vf4
 [job7]
 rw=read
-filename=/dev/nvme7n1
+filename=/dev/nvme6n1
 name=raw=seq-read-1vf5
 
 [job8]
 rw=read
-filename=/dev/nvme8n1
+filename=/dev/nvme7n1
 name=raw=seq-read-1vf6
 
 [job9]
 rw=read
-filename=/dev/nvme9n1
+filename=/dev/nvme8n1
 name=raw=seq-read-1vf7
 [job10]
 rw=read
-filename=/dev/nvme10n1
+filename=/dev/nvme9n1
 name=raw=seq-read-1vf8
 [job11]
 rw=read
-filename=/dev/nvme11n1
+filename=/dev/nvme10n1
 name=raw=seq-read-2vf1
 [job12]
 rw=read
-filename=/dev/nvme12n1
+filename=/dev/nvme11n1
 name=raw=seq-read-2vf2
 
 [job13]
 rw=read
-filename=/dev/nvme13n1
+filename=/dev/nvme12n1
 name=raw=seq-read-2vf3
 
 [job14]
 rw=read
-filename=/dev/nvme14n1
+filename=/dev/nvme13n1
 name=raw=seq-read-2vf4
 
 [job15]
 rw=read
-filename=/dev/nvme15n1
+filename=/dev/nvme14n1
 name=raw=seq-read-2vf5
 
 [job16]
 rw=read
-filename=/dev/nvme16n1
+filename=/dev/nvme15n1
 name=raw=seq-read-2vf6
 
 [job17]
 rw=read
-filename=/dev/nvme17n1
+filename=/dev/nvme16n1
 name=raw=seq-read-2vf7
 
 [job18]
 rw=read
-filename=/dev/nvme18n1
+filename=/dev/nvme17n1
 name=raw=seq-read-2vf8
+
