@@ -1,3 +1,4 @@
+# rand_read_bs4k_iodep1_job1_latancy
 [global]
 direct=1
 ioengine=libaio

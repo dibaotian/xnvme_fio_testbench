@@ -18,6 +18,8 @@ import logging
 import subprocess
 from tabulate import tabulate
 
+import psutil
+import cpuinfo
 
 logging.basicConfig(filename='/tmp/xnvmebench.log',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S',level=logging.INFO)
 logging.info('log begin.')
@@ -126,6 +128,8 @@ def do_fio_job(job_id,filename=None,fio_size=None,fio_runtime=None):
     run_fio_conf(job_id,filename,fio_size,fio_runtime)
     run_conf='{}/{}'.format(RUN_PATH,job_id)
     try:
+        # output=subprocess.getoutput("fio {}".format(run_conf))
+        # print(output)
         output=subprocess.getoutput("fio {} --output-format=json".format(run_conf))
         data=json.loads(output)
 
@@ -170,15 +174,15 @@ def fio_3x_result_format(data,job_id):
     numjobs_offset = 0
 
     if 'group_reporting' in data['global options'].keys():
-        print("group reporting")
-        # print(data)
+        # print("group reporting")
+        
 
         rw_type = data['jobs'][0]['job options']['rw']
 
         if rw_type == 'read' or rw_type == 'randread':
             result.append(data['jobs'][0]['job options']['rw'])
-            result.append(data['jobs'][0]['read']['iops'])
-            result.append(data['jobs'][0]['read']['bw'])
+            result.append(data['jobs'][0]['read']['iops']/1000)
+            result.append(data['jobs'][0]['read']['bw']/1024)
             result.append(data['jobs'][0]['read']['lat_ns']['mean']/1000/1000)
             result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["90.000000"]/1000/1000)
             result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["95.000000"]/1000/1000)
@@ -210,10 +214,10 @@ def fio_3x_result_format(data,job_id):
                 result.append("1")
 
         elif rw_type == 'write' or rw_type == 'randwrite':
-            print("write")
+            # print("write")
             result.append(data['jobs'][0]['job options']['rw'])
-            result.append(data['jobs'][0]['write']['iops'])
-            result.append(data['jobs'][0]['write']['bw'])
+            result.append(data['jobs'][0]['write']['iops']/1000)
+            result.append(data['jobs'][0]['write']['bw']/1024)
             result.append(data['jobs'][0]['write']['lat_ns']['mean']/1000/1000)
             result.append(data['jobs'][0]['write']['clat_ns']["percentile"]["90.000000"]/1000/1000)
             result.append(data['jobs'][0]['write']['clat_ns']["percentile"]["95.000000"]/1000/1000)
@@ -221,8 +225,8 @@ def fio_3x_result_format(data,job_id):
             result.append(data['jobs'][0]['write']['clat_ns']["percentile"]["99.900000"]/1000/1000)
    
             if 'iodepth' in data['jobs'][0]['job options'].keys():
-                print('get iodepth')
-                print(data['jobs'][0]['job options']['iodepth'])
+                # print('get iodepth')
+                # print(data['jobs'][0]['job options']['iodepth'])
                 result.append(data['jobs'][0]['job options']['iodepth'])
             elif 'iodepth' in data['global options'].keys():
                 result.append(data['global options']['iodepth'])
@@ -246,13 +250,13 @@ def fio_3x_result_format(data,job_id):
             else:
                 result.append("1")
         elif rw_type == 'rw' or rw_type == 'randrw':
-            print('randrw')
+            # print('randrw')
             if data['jobs'][0]['job options']['rw'] == 'randrw':
                 result.append('randread')
             else:
                 result.append('read')
-            result.append(data['jobs'][0]['read']['iops'])
-            result.append(data['jobs'][0]['read']['bw'])
+            result.append(data['jobs'][0]['read']['iops']/1000)
+            result.append(data['jobs'][0]['read']['bw']/1024)
             result.append(data['jobs'][0]['read']['lat_ns']['mean']/1000/1000)
             result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["90.000000"]/1000/1000)
             result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["95.000000"]/1000/1000)
@@ -277,6 +281,13 @@ def fio_3x_result_format(data,job_id):
 
             result.append(data['jobs'][0]['job options']['filename'])
 
+            if 'numjobs' in data['jobs'][0]['job options'].keys():
+                result.append(data['jobs'][0]['job options']['numjobs']+ ' threads')
+            elif 'numjobs' in data['global options'].keys():
+                result.append(data['global options']['numjobs'] +' threads')
+            else:
+                result.append("1")
+
             result_sum.append(result)
             result = []
 
@@ -285,8 +296,8 @@ def fio_3x_result_format(data,job_id):
             else:
                 result.append('write')
             # result.append(data['jobs'][int(job)+int(thread)]['job options']['rw']+'_'+str(job)+'_'+str(thread))
-            result.append(data['jobs'][0]['write']['iops'])
-            result.append(data['jobs'][0]['write']['bw'])
+            result.append(data['jobs'][0]['write']['iops']/1000)
+            result.append(data['jobs'][0]['write']['bw']/1024)
             result.append(data['jobs'][0]['write']['lat_ns']['mean']/1000/1000)
             result.append(data['jobs'][0]['write']['clat_ns']["percentile"]["90.000000"]/1000/1000)
             result.append(data['jobs'][0]['write']['clat_ns']["percentile"]["95.000000"]/1000/1000)
@@ -295,8 +306,8 @@ def fio_3x_result_format(data,job_id):
 
             
             if 'iodepth' in data['jobs'][0]['job options'].keys():
-                print('get iodepth')
-                print(data['jobs'][0]['job options']['iodepth'])
+                # print('get iodepth')
+                # print(data['jobs'][0]['job options']['iodepth'])
                 result.append(data['jobs'][0]['job options']['iodepth'])
             elif 'iodepth' in data['global options'].keys():
                 result.append(data['global options']['iodepth'])
@@ -339,8 +350,8 @@ def fio_3x_result_format(data,job_id):
             for thread in range(0, int(numjobs)):
                 if rw_type == 'read' or rw_type == 'randread':
                     result.append(data['jobs'][int(job)+int(thread)]['job options']['rw']+'_'+str(job)+'_'+str(thread))
-                    result.append(data['jobs'][int(job)+int(thread)]['read']['iops'])
-                    result.append(data['jobs'][int(job)+int(thread)]['read']['bw'])
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['iops']/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['bw']/1024)
                     result.append(data['jobs'][int(job)+int(thread)]['read']['lat_ns']['mean']/1000/1000)
                     result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["90.000000"]/1000/1000)
                     result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["95.000000"]/1000/1000)
@@ -368,8 +379,8 @@ def fio_3x_result_format(data,job_id):
                 elif rw_type == 'write' or rw_type == 'randwrite':
                     # result.append(rw_type +job+'_'+thread))
                     result.append(data['jobs'][int(job)+int(thread)]['job options']['rw']+'_'+str(job)+'_'+str(thread))
-                    result.append(data['jobs'][int(job)+int(thread)]['write']['iops'])
-                    result.append(data['jobs'][int(job)+int(thread)]['write']['bw'])
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['iops']/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['bw']/1024)
                     result.append(data['jobs'][int(job)+int(thread)]['write']['lat_ns']['mean']/1000/1000)
                     result.append(data['jobs'][int(job)+int(thread)]['write']['clat_ns']["percentile"]["90.000000"]/1000/1000)
                     result.append(data['jobs'][int(job)+int(thread)]['write']['clat_ns']["percentile"]["95.000000"]/1000/1000)
@@ -378,8 +389,8 @@ def fio_3x_result_format(data,job_id):
 
                     
                     if 'iodepth' in data['jobs'][int(job)+int(thread)]['job options'].keys():
-                        print('get iodepth')
-                        print(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
+                        # print('get iodepth')
+                        # print(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
                         result.append(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
                     elif 'iodepth' in data['global options'].keys():
                         result.append(data['global options']['iodepth'])
@@ -402,8 +413,8 @@ def fio_3x_result_format(data,job_id):
                         result.append('randread'+'_'+str(job)+'_'+str(thread))
                     else:
                         result.append('read'+'_'+str(job)+'_'+str(thread))
-                    result.append(data['jobs'][int(job)+int(thread)]['read']['iops'])
-                    result.append(data['jobs'][int(job)+int(thread)]['read']['bw'])
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['iops']/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['read']['bw']/1024)
                     result.append(data['jobs'][int(job)+int(thread)]['read']['lat_ns']['mean']/1000/1000)
                     result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["90.000000"]/1000/1000)
                     result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["95.000000"]/1000/1000)
@@ -436,8 +447,8 @@ def fio_3x_result_format(data,job_id):
                     else:
                         result.append('write'+'_'+str(job)+'_'+str(thread))
                     # result.append(data['jobs'][int(job)+int(thread)]['job options']['rw']+'_'+str(job)+'_'+str(thread))
-                    result.append(data['jobs'][int(job)+int(thread)]['write']['iops'])
-                    result.append(data['jobs'][int(job)+int(thread)]['write']['bw'])
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['iops']/1000)
+                    result.append(data['jobs'][int(job)+int(thread)]['write']['bw']/1024)
                     result.append(data['jobs'][int(job)+int(thread)]['write']['lat_ns']['mean']/1000/1000)
                     result.append(data['jobs'][int(job)+int(thread)]['write']['clat_ns']["percentile"]["90.000000"]/1000/1000)
                     result.append(data['jobs'][int(job)+int(thread)]['write']['clat_ns']["percentile"]["95.000000"]/1000/1000)
@@ -446,8 +457,8 @@ def fio_3x_result_format(data,job_id):
 
                     
                     if 'iodepth' in data['jobs'][int(job)+int(thread)]['job options'].keys():
-                        print('get iodepth')
-                        print(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
+                        # print('get iodepth')
+                        # print(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
                         result.append(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
                     elif 'iodepth' in data['global options'].keys():
                         result.append(data['global options']['iodepth'])
@@ -473,75 +484,13 @@ def fio_3x_result_format(data,job_id):
                 result_sum.append(result)
                 result = []
 
-    # print(result_sum)
-
     print_header(job_id)
 
     print(tabulate(result_sum, 
-        headers=['type', 'iops','bandwidth(MB)','latency_avg(ms)','latency_90%','latency_95%','latency_99%','latency_99.9%','iodepth','blk size', 'device', 'group'], 
+        headers=['type', 'iops(k)','bandwidth(MB)','latency_avg(ms)','latency_90%','latency_95%','latency_99%','latency_99.9%','iodepth','blk size', 'device', 'group'], 
         tablefmt='orgtbl'))
     
-    # rw_type=job_id.split('_')[1]
-
-    # if rw_type.startswith('r'):
-    #     rw_type=rw_type[1:]
-    # #print 'begin format fio result'
-    # ## data[jobs] value is a list,the list only one item for jobnum is 1,if there is more jobs,need to modify
-    # if 'w' not in rw_type:
-    #     # this is r 
-    #     result['type']='read'
-    #     result['iops']=data['jobs'][0]['read']['iops']
-    #     result['bandwidth']=data['jobs'][0]['read']['bw']
-
-    #     result['latency_avg']=data['jobs'][0]['read']['lat_ns']['mean']/1000/1000
-    #     result['latency_900']=data['jobs'][0]['read']['clat_ns']["percentile"]["90.000000"]/1000/1000
-    #     result['latency_950']=data['jobs'][0]['read']['clat_ns']["percentile"]["95.000000"]/1000/1000
-    #     result['latency_990']=data['jobs'][0]['read']['clat_ns']["percentile"]["99.000000"]/1000/1000
-    #     result['latency_999']=data['jobs'][0]['read']['clat_ns']["percentile"]["99.900000"]/1000/1000
-    #     print_header(job_id)
-    #     #print '{}                |{}                  |{}'.format(result['type'],result['iops'],result['bandwidth'])
-    #     print (tabulate([[result['type'], result['iops'],result['bandwidth'],result['latency_avg'], result['latency_900'],result['latency_950'],result['latency_990'],result['latency_999']]], 
-    #                      headers=['type', 'iops','bandwidth(MB)','latency_avg(ms)','latency_90%()','latency_95%','latency_99%','latency_99.9%'], tablefmt='orgtbl'))
-
-    # elif 'r' not in rw_type:
-    #     # this is w
-    #     result['type']='write'
-    #     result['iops']=data['jobs'][0]['write']['iops']
-    #     result['bandwidth']=data['jobs'][0]['write']['bw']
-
-    #     result['latency_avg']=data['jobs'][0]['write']['lat_ns']['mean']/1000/1000
-    #     result['latency_900']=data['jobs'][0]['write']['clat_ns']["percentile"]["90.000000"]/1000/1000
-    #     result['latency_950']=data['jobs'][0]['write']['clat_ns']["percentile"]["95.000000"]/1000/1000
-    #     result['latency_990']=data['jobs'][0]['write']['clat_ns']["percentile"]["99.000000"]/1000/1000
-    #     result['latency_999']=data['jobs'][0]['write']['clat_ns']["percentile"]["99.900000"]/1000/1000
-    #     print_header(job_id)
-    #     #pprint '{}                |{}                    |{}'.format(result['type'],result['iops'],result['bandwidth'])
-    #     print (tabulate([[result['type'], result['iops'],result['bandwidth'],result['latency_avg'], result['latency_900'],result['latency_950'],result['latency_990'],result['latency_999']]], headers=['type', 'iops','bandwidth(MB)','latency_avg(ms)','latency_90%','latency_95%','latency_99%','latency_99.9%'], tablefmt='orgtbl'))
-
-    # else:
-    #     result['type']='read and write'
-    #     result['read_iops']=data['jobs'][0]['read']['iops']
-    #     result['read_bandwidth']=data['jobs'][0]['read']['bw']
-    #     result['read_latency_avg']=data['jobs'][0]['read']['lat_ns']['mean']/1000/1000
-    #     result['read_latency_900']=data['jobs'][0]['read']['clat_ns']["percentile"]["90.000000"]/1000/1000
-    #     result['read_latency_950']=data['jobs'][0]['read']['clat_ns']["percentile"]["95.000000"]/1000/1000
-    #     result['read_latency_990']=data['jobs'][0]['read']['clat_ns']["percentile"]["99.000000"]/1000/1000
-    #     result['read_latency_999']=data['jobs'][0]['read']['clat_ns']["percentile"]["99.900000"]/1000/1000
-        
-    #     result['write_iops']=data['jobs'][0]['write']['iops']
-    #     result['write_bandwidth']=data['jobs'][0]['write']['bw']
-        
-    #     result['write_latency_avg']=data['jobs'][0]['write']['lat_ns']['mean']/1000/1000
-    #     result['write_latency_900']=data['jobs'][0]['write']['clat_ns']["percentile"]["90.000000"]/1000/1000
-    #     result['write_latency_950']=data['jobs'][0]['write']['clat_ns']["percentile"]["95.000000"]/1000/1000
-    #     result['write_latency_990']=data['jobs'][0]['write']['clat_ns']["percentile"]["99.000000"]/1000/1000
-    #     result['write_latency_999']=data['jobs'][0]['write']['clat_ns']["percentile"]["99.900000"]/1000/1000
-    #     print_header(job_id)
-    #     #print 'read        |{}             |{}'.format(result['read_iops'],result['read_bandwidth'])
-    #     #print 'write       |{}             |{}'.format(result['write_iops'],result['write_bandwidth'])
-
-    #     print (tabulate([['read', result['read_iops'],result['read_bandwidth'],result['read_latency_avg'],result['read_latency_900'],result['read_latency_950'],result['read_latency_990'],result['read_latency_999']],['write',result['write_iops'],result['write_bandwidth'],result['write_latency_avg'],result['write_latency_900'],result['write_latency_950'],result['write_latency_990'],result['write_latency_999']]],headers=['type', 'iops','bandwidth(MB)','latency_avg(ms)','latency_90%','latency_95%','latency_99%','latency_99.9%'], tablefmt='orgtbl'))
-    
+   
     #print result
 def do_all_fio_jobs(fio_filename,fio_size,fio_runtime):
      try:
@@ -551,11 +500,15 @@ def do_all_fio_jobs(fio_filename,fio_size,fio_runtime):
      except Exception as e:
          print ('counter exception: {}'.format(str(e)))
 
-def do_group_fio_jobs(group_path):
+def do_group_fio_jobs(group_path, fio_runtime=None):
      try:
-         files= os.listdir(group_path)
-         for each_file in files:
-             do_fio_job(each_file)
+        files= os.listdir(group_path)
+        if fio_runtime != None:
+            for each_file in files:
+                do_fio_job(each_file, fio_runtime=fio_runtime)
+        else:
+            for each_file in files:
+                do_fio_job(each_file)
      except Exception as e:
          print ('counter exception: {}'.format(str(e)))
 
@@ -594,31 +547,46 @@ def main():
     
     if options.job_id:
         if not options.runtime_of_each_job and not options.destination:
-            print("运行指定测试用例{}".format(options.job_id))
+            print("执行用例{}".format(options.job_id))
             do_fio_job(options.job_id)
 
-    # def do_fio_job(job_id,filename=None,fio_size=None,fio_runtime=None):
+    # do_fio_job(job_id,filename=None,fio_size=None,fio_runtime=None):
     if options.job_id and options.destination:
-        print("指定测试用例{}，指定NVME盘{}".format(options.job_id,options.destination))
+        print("执行用例{}，指定NVME盘{}".format(options.job_id,options.destination))
         do_fio_job(options.job_id, filename=options.destination)
         return 
         
     if options.job_id and options.runtime_of_each_job:
-        print("指定测试用例{}，指定运行时间{}".format(options.job_id, options.runtime_of_each_job))
+        print("执行用例{}，运行时间{}秒".format(options.job_id, options.runtime_of_each_job))
         do_fio_job(options.job_id, fio_runtime=options.runtime_of_each_job)
         return
 
     if options.group_id:
-        print("执行一组用例")
+        if not options.runtime_of_each_job:
+            print("执行用例组{}".format(options.group_id))
+            print(options.group_id)
+            do_group_fio_jobs(options.group_id)
+            return
+
+    if options.group_id and options.runtime_of_each_job:
+        print("执行用例组{} 每个用例运行时间{}秒".format(options.group_id, options.runtime_of_each_job))
         print(options.group_id)
-        do_group_fio_jobs(options.group_id)
+        do_group_fio_jobs(options.group_id,options.runtime_of_each_job)
         return
 
     if  options.destination and options.size and options.runtime_of_each_job:
         if not options.job_id:
             do_all_fio_jobs(options.destination,options.size,options.runtime_of_each_job)
 
-
+def get_system_info():
+    try:
+        cpu = cpuinfo.get_cpu_info()
+        print("CPU:  {} {} {}bit {}core {}Hz".format(cpu['brand_raw'],cpu['arch'], cpu['bits'], cpu['count'], cpu['hz_actual'][0]))
+        mem = psutil.virtual_memory()
+        print("内存: {}G".format(mem.total/1024/1024/1024))
+    except Exception as e:
+         print("Get system info fail")
+        #  print ('counter exception: {}'.format(str(e)))
 
 if __name__ == '__main__':
 
@@ -626,8 +594,8 @@ if __name__ == '__main__':
         print ("Access the nvme disk must be run as root. Aborting.")
         sys.exit(1)
     else:
+        get_system_info()
         main()
-        print("\n")
         print("####   Complete   ####")
         print("\n")
         sys.exit(0)
