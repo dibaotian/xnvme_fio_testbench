@@ -9,15 +9,15 @@
 [global]
 direct=1
 ioengine=libaio
-randrepeat=0
+# randrepeat=0
 bs=4k
 iodepth=32
 size=100%
 group_reporting=1
-time_based
-runtime=5
+# time_based
+# runtime=5
 
-[job1-4k-rand write]
+[job1-4k-rand read]
 rw=randread
 numjobs=8
 filename=/dev/nvme0n1

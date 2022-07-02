@@ -9,7 +9,7 @@
 [global]
 direct=1
 ioengine=libaio
-randrepeat=0
+# randrepeat=0
 bs=4k
 iodepth=32
 size=100%

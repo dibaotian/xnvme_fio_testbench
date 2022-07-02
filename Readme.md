@@ -31,14 +31,14 @@
 ##### rw=read                  测试顺序读的I/O
 ##### rw=write                 测试顺序写的I/O
 ##### rw=rw                    测试顺序混合写和读的I/O
-##### bs=4k                    单次io的块文件大小为4k
+##### bs=4k                    单次io的块文件大小为4k,一般来说块大小为 512B  4K 16K .....1M、4M 这样的扇区大小（512字节）的倍数，小于16K的文件，一般算作小文件，大于16K的文件属于大文件
 ##### bsrange=512-2048         同上，指定定数据块的大小范围
-##### size=50g                 寻址空间，这里是以每次4k的io进行50G的空间测试，, size=100%,对整个磁盘测试
+##### size=50g                 寻址空间，这里是以每次4k的io进行50G的空间测试, size=100%?
 ##### numjobs=30               本次的测试线程为30
 ##### runtime=1000             测试时间为1000秒，如果不写则一直将5g文件分4k每次写完为止
 ##### ioengine=libaio          负载引擎，发起异步IO读写请求，io引擎使用libaio引擎， 也可以指定其它方式，例如pync
 #####                          libaio:Linux native asynchronous I/O. Note that Linux may only support queued behavior with non-buffered I/O (set direct=1 or buffered=0). This engine defines engine specific options.
-##### iodepth                  队列深度，只有使用libaio的时候有意义，队列深度影响IOPS
+##### iodepth                  队列深度，一次提交I/O请求的数目，（只对异步I/O引擎有用），队列深度影响IOPS
 ##### rwmixwrite=30            在混合读写的模式下，写占30%
 ##### group_reporting          关于显示结果的，汇总每个进程的信息
 ##### lockmem=1g               只使用1g内存进行测试
@@ -73,11 +73,9 @@
 ##### ticks=Number of ticks we kept the disk busy.
 ##### util=磁盘利用率
 
-##### P5510
+##### Concern
 ##### 1 Random read & write IOPS
-#####  block size  4k/8k
-##### 2 Sequential read & write IOPS
-
+##### 2 Sequential read & write bandwidth
 ##### 3 Typical latency 
 ##### 4 quality of service
 

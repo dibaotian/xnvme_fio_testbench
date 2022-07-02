@@ -127,10 +127,14 @@ def do_fio_job(job_id,filename=None,fio_size=None,fio_runtime=None):
 
     run_fio_conf(job_id,filename,fio_size,fio_runtime)
     run_conf='{}/{}'.format(RUN_PATH,job_id)
+    # todo 打印开始时间
     try:
         # output=subprocess.getoutput("fio {}".format(run_conf))
         # print(output)
+        start = time.time()
         output=subprocess.getoutput("fio {} --output-format=json".format(run_conf))
+        end = time.time()
+        print("========= fio spend {} mins=======".format(float(end-start)/float(60.00)))
         data=json.loads(output)
 
         # format data
@@ -138,14 +142,15 @@ def do_fio_job(job_id,filename=None,fio_size=None,fio_runtime=None):
         logging.info('fio result is :{}.'.format(json.dumps(data)))
     
         fio_version=get_fio_version()
-        print ("check the fio version: {}".format(fio_version))
+        # print ("check the fio version: {}".format(fio_version))
 
         if fio_version == 'version3':
             fio_3x_result_format(data,job_id)
         else:
             print ('fio version is not expected')
+            exit(-1)
     except Exception as e:
-        print(data)
+        print(output)
         print ('do_fio_job exception: {}'.format(str(e)))
          
 
@@ -475,9 +480,6 @@ def fio_3x_result_format(data,job_id):
 
                     result.append(data['jobs'][int(job)+int(thread)]['job options']['filename'])
 
-
-
-
                 else:
                     print("does not match")
                 
@@ -552,24 +554,24 @@ def main():
 
     # do_fio_job(job_id,filename=None,fio_size=None,fio_runtime=None):
     if options.job_id and options.destination:
-        print("执行用例{}，指定NVME盘{}".format(options.job_id,options.destination))
+        print("开始执行用例{}，指定NVME盘{}".format(options.job_id,options.destination))
         do_fio_job(options.job_id, filename=options.destination)
         return 
         
     if options.job_id and options.runtime_of_each_job:
-        print("执行用例{}，运行时间{}秒".format(options.job_id, options.runtime_of_each_job))
+        print("开始执行用例{}，设置运行{}秒".format(options.job_id, options.runtime_of_each_job))
         do_fio_job(options.job_id, fio_runtime=options.runtime_of_each_job)
         return
 
     if options.group_id:
         if not options.runtime_of_each_job:
-            print("执行用例组{}".format(options.group_id))
+            print("开始执行用例组{}".format(options.group_id))
             print(options.group_id)
             do_group_fio_jobs(options.group_id)
             return
 
     if options.group_id and options.runtime_of_each_job:
-        print("执行用例组{} 每个用例运行时间{}秒".format(options.group_id, options.runtime_of_each_job))
+        print("开始执行用例组{} 设置每个用例运行{}秒".format(options.group_id, options.runtime_of_each_job))
         print(options.group_id)
         do_group_fio_jobs(options.group_id,options.runtime_of_each_job)
         return
@@ -584,6 +586,10 @@ def get_system_info():
         print("CPU:  {} {} {}bit {}core {}Hz".format(cpu['brand_raw'],cpu['arch'], cpu['bits'], cpu['count'], cpu['hz_actual'][0]))
         mem = psutil.virtual_memory()
         print("内存: {}G".format(mem.total/1024/1024/1024))
+
+        print("系统： {}".format(subprocess.getoutput("uname -a")))
+        print("工具： {}".format(subprocess.getoutput("fio -v")))
+
     except Exception as e:
          print("Get system info fail")
         #  print ('counter exception: {}'.format(str(e)))
