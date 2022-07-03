@@ -26,6 +26,8 @@ from tabulate import tabulate
 import psutil
 import cpuinfo
 
+from pandas import DataFrame
+
 logging.basicConfig(filename='/tmp/xnvmebench.log',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S',level=logging.INFO)
 logging.info('log begin.')
 
@@ -35,6 +37,7 @@ logging.info('log begin.')
 PWD=os.path.abspath(os.curdir)
 PATH=PWD
 RUN_PATH='/tmp/xnvme/conf'
+DATA_PATH='/tmp/xnvme/data'
 
 
 def list_fio_pattern():
@@ -62,8 +65,12 @@ def print_fio_pattern(test_type,job_id):
 
 def run_fio_conf(job_id=None,filename=None,fio_size=None,fio_runtime=None):
     
+    # todo check the output return
     output=subprocess.getoutput("mkdir -p {}".format(RUN_PATH))
+
     output=subprocess.getoutput("cp -r {}/{} {}".format(PATH,job_id,RUN_PATH))
+
+    output=subprocess.getoutput("mkdir -p {}".format(DATA_PATH))
 
     file='{}/{}'.format(RUN_PATH,job_id)
     # print(file)
@@ -186,7 +193,6 @@ def fio_3x_result_format(data,job_id):
     if 'group_reporting' in data['global options'].keys():
         # print("group reporting")
         
-
         rw_type = data['jobs'][0]['job options']['rw']
 
         if rw_type == 'read' or rw_type == 'randread':
@@ -493,9 +499,19 @@ def fio_3x_result_format(data,job_id):
 
     print_header(job_id)
 
-    print(tabulate(result_sum, 
-        headers=['type', 'iops(k)','bandwidth(MB)','latency_avg(ms)','latency_90%','latency_95%','latency_99%','latency_99.9%','iodepth','blk size', 'device', 'group'], 
-        tablefmt='orgtbl'))
+    # print(result_sum)
+
+    #execel 表头
+    if 'group_reporting' in data['global options'].keys():
+        columns_head = ['type', 'iops(k)','bandwidth(MB)','latency_avg(ms)','latency_90%','latency_95%','latency_99%','latency_99.9%','iodepth','blk size', 'device','group']
+    else:
+        columns_head = ['type', 'iops(k)','bandwidth(MB)','latency_avg(ms)','latency_90%','latency_95%','latency_99%','latency_99.9%','iodepth','blk size', 'device']
+
+    df = DataFrame(data = result_sum, columns = columns_head)
+    # DATA_PATH
+    df.to_excel(DATA_PATH+'/'+job_id+data['time']+'.xlsx', sheet_name=job_id, index=False)
+
+    print(tabulate(result_sum, headers=columns_head, tablefmt='orgtbl'))
     
    
     #print result

@@ -13,10 +13,13 @@
 ##### 7 支持 iops(k) |   bandwidth(MB) |   latency_avg(ms) |   latency_90% |   latency_95% |   latency_99% |   latency_99.9%  数据统计
 
 ### Restriction
-##### 1 不支[job]下group reporting设置, group reporting 必须放在[global]下面
-##### 2 运行时候，size 不能小于 block size
-##### 3 numjobs 必须设置在[jobsx]下,不能在[global]
-##### 4 多个[jobx] ，每个[job] 指向不同的nvme disk 的时候，[global]不能使用 direct=1
+##### 1 Python3 运行
+##### 2 适配FIO 3.x， FIO2.x 没有进过测试
+##### 3 适配liboio engine， 其它ioengine 没有测试
+##### 4 不支[job]下group reporting设置, group reporting 必须放在[global]下面
+##### 5 运行时候，size 不能小于 block size
+##### 6 numjobs 必须设置在[jobsx]下,不能在[global]
+##### 7 多个[jobx] ，每个[job] 指向不同的nvme disk 的时候，[global]不能使用 direct=1
 
 #### bug
 ##### bug1：多个[job]情况下，[global] 配置group reporting会报错误
