@@ -1,0 +1,6 @@
+CPU:  12th Gen Intel(R) Core(TM) i7-12700K X86_64 64bit 20core 3347867000Hz
+内存: 31.137985229492188G
+系统： Linux Z690 5.4.0-120-generic #136~18.04.1-Ubuntu SMP Fri Jun 10 18:00:44 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+工具： fio-3.1
+开始执行用例组P5510_RAND_RW_IOPS 设置每个用例运行30秒
+P5510_RAND_RW_IOPS
