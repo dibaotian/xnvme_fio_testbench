@@ -1,21 +1,25 @@
 ### Readme
 
-### the test bench is based on the FIO
+### the test bench is based on the FIO （3.x）
 ### https://fio.readthedocs.io/en/latest/fio_doc.html
 
-### 功能
-##### 支持单个case 运行
-##### 支持分组case 运行
+### Function
+##### 1 支持单个case 运行
+##### 2 支持分组case 运行
+##### 3 支持指定NVME磁盘运行
+##### 4 支持自由设定运行时长
+##### 5 支持自由设置测试磁盘大小
+##### 6 支持打印配置文件
+##### 7 支持 iops(k) |   bandwidth(MB) |   latency_avg(ms) |   latency_90% |   latency_95% |   latency_99% |   latency_99.9%  数据统计
 
-### restriction
-##### 不支[job]下group reporting设置, group reporting 必须放在[global]下面
-##### 运行时候，size 不能小于 block size
-##### numjobs 必须设置在[jobsx]下,不能在[global]
-##### 多个[jobx] ，每个[job] 指向不同的nvme disk 的时候，[global]不能使用 direct=1
+### Restriction
+##### 1 不支[job]下group reporting设置, group reporting 必须放在[global]下面
+##### 2 运行时候，size 不能小于 block size
+##### 3 numjobs 必须设置在[jobsx]下,不能在[global]
+##### 4 多个[jobx] ，每个[job] 指向不同的nvme disk 的时候，[global]不能使用 direct=1
 
 #### bug
 ##### bug1：多个[job]情况下，[global] 配置group reporting会报错误
-
 
 
 ### about FIO configure parameter and result

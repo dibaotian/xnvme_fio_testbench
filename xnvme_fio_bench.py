@@ -524,15 +524,14 @@ def main():
     parser = argparse.ArgumentParser(
         description='xnvme fio bench')
     parser.add_argument('-r','--type', action="store_true",default='nvme',help='info')
-    parser.add_argument('-l','--listjobs', action="store_true",help='destination of rsync, cannot be empty')
+    parser.add_argument('-l','--listjobs', action="store_true",help='destination of jobs, cannot be empty')
     parser.add_argument('-p','--printjobs', action="store_true",help='print job')
-
     parser.add_argument('-j','--job_id',help='job id')
-    parser.add_argument('-g','--group_id',help='group id')
-    parser.add_argument('-t','--runtime_of_each_job',help='run_time_of_each_job')
+    parser.add_argument('-g','--group_id',help='group id， cannot be empty')
+    parser.add_argument('-t','--runtime_of_each_job',help='run time of each job')
     parser.add_argument('-d','--destination',
-                        help='filename parameter in fio, for iscsi it is a device like /dev/sdx, for nas it is directory')
-    parser.add_argument('-s','--size',help='size parameter in fio,like 10M or 10G or 1T')
+                        help='filename parameter in fio, for NVME it is a device like /dev/nvme0n1')
+    parser.add_argument('-s','--size',help='size parameter in fio,like 100M or 10G or 1T')
 
 
     options = parser.parse_args()
