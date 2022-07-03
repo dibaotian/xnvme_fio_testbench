@@ -16,8 +16,8 @@ bs=4k
 iodepth=1
 size=100%
 #group_reporting=1
-time_based
-runtime=5
+# time_based
+# runtime=5
 
 [job1 seq read]
 rw=read

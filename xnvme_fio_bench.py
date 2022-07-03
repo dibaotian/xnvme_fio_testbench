@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# author: minx@amd.com
+# based on the Python3
+# support FIO 3.x
+# validate on the libaio ioengine
+
 import os
 import re
 import sys
@@ -549,7 +554,7 @@ def main():
     
     if options.job_id:
         if not options.runtime_of_each_job and not options.destination:
-            print("执行用例{}".format(options.job_id))
+            print("开始执行用例{}".format(options.job_id))
             do_fio_job(options.job_id)
 
     # do_fio_job(job_id,filename=None,fio_size=None,fio_runtime=None):
@@ -565,7 +570,7 @@ def main():
 
     if options.group_id:
         if not options.runtime_of_each_job:
-            print("开始执行用例组{}".format(options.group_id))
+            print("开始执行用例组{}".format(options.group_id))
             print(options.group_id)
             do_group_fio_jobs(options.group_id)
             return
