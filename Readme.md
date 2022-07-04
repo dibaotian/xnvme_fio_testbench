@@ -3,6 +3,11 @@
 ### the test bench is based on the FIO （3.x）
 ### https://fio.readthedocs.io/en/latest/fio_doc.html
 
+### Install
+#### git clone https://github.com/dibaotian/xnvme_fio_testbench.git
+#### cd xnvme_fio_testbench
+#### pip3 install -r requirements.txt
+
 ### Function
 ##### 1 支持单个case 运行
 ##### 2 支持分组case 运行
@@ -11,15 +16,13 @@
 ##### 5 支持自由设置测试磁盘大小
 ##### 6 支持打印配置文件
 ##### 7 支持 iops(k) |   bandwidth(MB) |   latency_avg(ms) |   latency_90% |   latency_95% |   latency_99% |   latency_99.9%  数据统计
+##### 8 支持统计文件生成xlxs文件
 
 ### Restriction
 ##### 1 Python3 运行
 ##### 2 适配FIO 3.x， FIO2.x 没有进过测试
-##### 3 适配liboio engine， 其它ioengine 没有测试
-##### 4 不支[job]下group reporting设置, group reporting 必须放在[global]下面
-##### 5 运行时候，size 不能小于 block size
-##### 6 numjobs 必须设置在[jobsx]下,不能在[global]
-##### 7 多个[jobx] ，每个[job] 指向不同的nvme disk 的时候，[global]不能使用 direct=1
+##### 3 适配libaio engine， 其它ioengine 没有测试
+h
 
 #### bug
 ##### bug1：多个[job]情况下，[global] 配置group reporting会报错误
