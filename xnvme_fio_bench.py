@@ -271,16 +271,17 @@ def fio_3x_result_format(data,job_id):
         elif rw_type == 'rw' or rw_type == 'randrw':
             # print('randrw')
             if data['jobs'][0]['job options']['rw'] == 'randrw':
-                result.append('randread')
+                result.append('rw-randread')
             else:
-                result.append('read')
-                result.append(data['jobs'][0]['read']['iops']/1000)
-                result.append(data['jobs'][0]['read']['bw']/1024)
-                result.append(data['jobs'][0]['read']['lat_ns']['mean']/1000)
-                result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["90.000000"]/1000)
-                result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["95.000000"]/1000)
-                result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["99.000000"]/1000)
-                result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["99.900000"]/1000)
+                result.append('rw-read')
+
+            result.append(data['jobs'][0]['read']['iops']/1000)
+            result.append(data['jobs'][0]['read']['bw']/1024)
+            result.append(data['jobs'][0]['read']['lat_ns']['mean']/1000)
+            result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["90.000000"]/1000)
+            result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["95.000000"]/1000)
+            result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["99.000000"]/1000)
+            result.append(data['jobs'][0]['read']['clat_ns']["percentile"]["99.900000"]/1000)
 
             if 'iodepth' in data['jobs'][0]['job options'].keys():
                 # print(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
@@ -311,9 +312,10 @@ def fio_3x_result_format(data,job_id):
             result = []
 
             if data['jobs'][0]['job options']['rw'] == 'randrw':
-                result.append('randwrite')
+                result.append('rw-randwrite')
             else:
-                result.append('write')
+                result.append('rw-write')
+
             # result.append(data['jobs'][int(job)+int(thread)]['job options']['rw']+'_'+str(job)+'_'+str(thread))
             result.append(data['jobs'][0]['write']['iops']/1000)
             result.append(data['jobs'][0]['write']['bw']/1024)
@@ -342,6 +344,13 @@ def fio_3x_result_format(data,job_id):
                 result.append("")
 
             result.append(data['jobs'][0]['job options']['filename'])
+
+            if 'numjobs' in data['jobs'][0]['job options'].keys():
+                result.append(data['jobs'][0]['job options']['numjobs']+ ' threads')
+            elif 'numjobs' in data['global options'].keys():
+                result.append(data['global options']['numjobs'] +' threads')
+            else:
+                result.append("1")
 
         else:
             print("does not match")
@@ -433,13 +442,13 @@ def fio_3x_result_format(data,job_id):
                         result.append('randread'+'_'+str(job)+'_'+str(thread))
                     else:
                         result.append('read'+'_'+str(job)+'_'+str(thread))
-                    result.append(data['jobs'][int(job)+int(thread)]['read']['iops']/1000)
-                    result.append(data['jobs'][int(job)+int(thread)]['read']['bw']/1024)
-                    result.append(data['jobs'][int(job)+int(thread)]['read']['lat_ns']['mean']/1000)
-                    result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["90.000000"]/1000)
-                    result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["95.000000"]/1000)
-                    result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["99.000000"]/1000)
-                    result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["99.900000"]/1000)
+                        result.append(data['jobs'][int(job)+int(thread)]['read']['iops']/1000)
+                        result.append(data['jobs'][int(job)+int(thread)]['read']['bw']/1024)
+                        result.append(data['jobs'][int(job)+int(thread)]['read']['lat_ns']['mean']/1000)
+                        result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["90.000000"]/1000)
+                        result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["95.000000"]/1000)
+                        result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["99.000000"]/1000)
+                        result.append(data['jobs'][int(job)+int(thread)]['read']['clat_ns']["percentile"]["99.900000"]/1000)
 
                     if 'iodepth' in data['jobs'][int(job)+int(thread)]['job options'].keys():
                         # print(data['jobs'][int(job)+int(thread)]['job options']['iodepth'])
