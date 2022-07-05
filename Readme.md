@@ -6,7 +6,13 @@
 ### Install
 #### git clone https://github.com/dibaotian/xnvme_fio_testbench.git
 #### cd xnvme_fio_testbench
+#### sudo apt install python3-pip
 #### pip3 install -r requirements.txt
+#### pip3 install tabulate
+#### pip3 install psutil
+#### pip3 install py-cpuinfo
+#### pip3 install pandas
+#### pip3 install openpyxl
 
 ### Function
 ##### 1 支持单个case 运行
@@ -22,7 +28,6 @@
 ##### 1 Python3 运行
 ##### 2 适配FIO 3.x， FIO2.x 没有进过测试
 ##### 3 适配libaio engine， 其它ioengine 没有测试
-h
 
 #### bug
 ##### bug1：多个[job]情况下，[global] 配置group reporting会报错误
@@ -46,8 +51,7 @@ h
 ##### size=50g                 寻址空间，这里是以每次4k的io进行50G的空间测试, size=100%?
 ##### numjobs=30               本次的测试线程为30
 ##### runtime=1000             测试时间为1000秒，如果不写则一直将5g文件分4k每次写完为止
-##### ioengine=libaio          负载引擎，发起异步IO读写请求，io引擎使用libaio引擎， 也可以指定其它方式，例如pync
-#####                          libaio:Linux native asynchronous I/O. Note that Linux may only support queued behavior with non-buffered I/O (set direct=1 or buffered=0). This engine defines engine specific options.
+##### ioengine=libaio          负载引擎，发起异步IO读写请求，io引擎使用libaio引擎， 也可以指定其它方式，例如pync.libaio:Linux native asynchronous I/O. Note that Linux may only support queued behavior with non-buffered I/O (set direct=1 or buffered=0). This engine defines engine specific options.
 ##### iodepth                  队列深度，一次提交I/O请求的数目，（只对异步I/O引擎有用），队列深度影响IOPS
 ##### rwmixwrite=30            在混合读写的模式下，写占30%
 ##### group_reporting          关于显示结果的，汇总每个进程的信息
@@ -55,8 +59,11 @@ h
 ##### zero_buffers             用0初始化系统buffer
 ##### nrfiles=8                每个进程生成文件的数量
 ##### stonewall                确保当前执行块和下个执行块串行执行
+##### randrepeat=1             对于随机IO负载，配置生成器的种子，使得路径是可以预估的，使得每次重复执行生成的序列是一样的。randrepeat：默认是True, 如果不设置randrepeat=0这个参数不会影响seqread，但会影响seqwrite,randwrite,randread.
+##### loops=int                重复运行某个job多次，默认是1
+##### ramp_time = 30	       定义测试的热身时间，以秒为单位。热身时间不计入测试统计。
 
-##### Result
+### Result
 ##### io=执行了多少M的IO
 ##### bw=平均IO带宽
 ##### iops=IOPS
