@@ -343,12 +343,6 @@ def fio_3x_result_format(data,job_id):
 
             result.append(data['jobs'][0]['job options']['filename'])
 
-            if 'numjobs' in data['jobs'][0]['job options'].keys():
-                result.append(data['jobs'][0]['job options']['numjobs']+ ' threads')
-            elif 'numjobs' in data['global options'].keys():
-                result.append(data['global options']['numjobs'] +' threads')
-            else:
-                result.append("1")
         else:
             print("does not match")
 
