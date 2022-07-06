@@ -10,6 +10,7 @@ import os
 import re
 import sys
 import time
+import datetime
 import math
 import argparse
 from itertools import chain
@@ -146,6 +147,7 @@ def do_fio_job(job_id,filename=None,fio_size=None,fio_runtime=None):
     try:
         # output=subprocess.getoutput("fio {}".format(run_conf))
         # print(output)
+        print ("start in {}".format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
         start = time.time()
         output=subprocess.getoutput("fio {} --output-format=json".format(run_conf))
         end = time.time()

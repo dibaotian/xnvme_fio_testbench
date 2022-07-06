@@ -98,6 +98,7 @@
 
 ##### iostat
 ###### iostat -mx 1 -d <device>
+###### iostat -c -d -x -t -m /dev/nvme0n1 1
 ###### rrqm/s: 每秒对该设备的读请求被合并次数，文件系统会对读取同块(block)的请求进行合并
 ###### wrqm/s: 每秒对该设备的写请求被合并次数
 ###### r/s: 每秒完成的读次数
@@ -109,5 +110,58 @@
 ###### await: 平均每次IO请求等待时间(包括等待时间和处理时间，毫秒为单位)
 ###### svctm: 平均每次IO请求的处理时间(毫秒为单位)
 ###### %util: 采用周期内用于IO操作的时间比率，在统计时间内所有处理IO时间，除以总共统计时间。例如，如果统计间隔1秒，该设备有0.8秒在处理IO，而0.2秒闲置，那么该设备的%util = 0.8/1 = 80%，所以该参数表示了设备的繁忙程度
+
+
+### precondition
+##### why precondition
+##### To truly profile an SSD you have to use the entire drive. If you restrict the size written to a fraction of the drive an SSD will use the remainder as increased overprovision to reduce write amplification and performance. Also, most SSD's will not access NAND for reads to LBAs not already written. When you measure a read to an unwritten LBA you actual measure the speed at which the SSD can create 0's and ship them back.
+
+
+There are multiple ways how you can prepare the drive for the benchmarking. 
+Here are basic steps to follow to get reliable data at the end:
+##### 1. Secure Erase SSD
+##### why？The erase applies to all user data, regardless of location (e.g., within an exposed LBA, within a cache, within deallocated LBAs, etc). Defaults to 0. There are two types of secure erase. The User Data Erase erases all user content present in the NVM subsystem. The Cryptographic Erase erases all user content present in the NVM subsystem by deleting the encryption key with which the user data was previously encrypted.
+
+2. Fill SSD with sequential data twice of it's capacity. This will gurantee all available memory is filled with a data including factory provisioned area. DD is the easiest way for this: dd if=/dev/zero bs=1024k of=/dev/"devicename"
+
+3. If you're running sequential workload to estimate the read or write throughput then skip the next step.
+
+4. Fill the drive with 4k random data. The same rule, total amount of data is twice drive's capacity.
+   Use FIO for this purpose. Here is an example script for NVMe SSD:
+	[global]
+	name=4k random write 4 ios in the queue in 32 queues
+	filename=/dev/nvme0n1
+	ioengine=libaio
+	direct=1
+	bs=4k
+	rw=randwrite
+	iodepth=4
+	numjobs=32
+	buffered=0
+	size=100%
+	loops=2	
+	[job1]
+ 
+5. Run your workload. Usually meassurements starts after 5 minutes of runtime in order to let the SSD FW 
+   adopting to the workload. It's called sustained performance state. This time depends on the SSD 
+   Vendor/SKU/capacity.  
+
+
+
+### How to test the nvme
+##### SSDs are sensitive to their write-history, to how full their capacity is and to system variations, which means that SSDs have unique requirements to accurately measure
+
+##### Test mechanics
+##### Preconditioning
+##### Common measurement tools used to construct a write-saturation plot
+##### How system configurations can affect measured performance
+##### Repeatability: Given the same set of inputs, the results should always be within the expected run-to-run variance.
+#####  SSD performance can change as the drive is being written, our Enterprise performance measurement focuses on the steady state performance region.
+
+##### 1. Purge: Regardless of what has been done previously to the SSD, a purge puts the drive in a known, fixed state that emulates the state in which the drive would be received from the manufacturer, the fresh-out-of-box (FOB) state.
+##### uses the secure erase or sanitize commands with NVME disk
+##### place the sample SSD in an FOB state
+##### secure erase or sanitize is not the same as format (format may or may not restore the SSD to the FOB state)
+##### 2. Precondition: for workload-independent precondition, write the drive with 128KB sequential transfers aligned to 4K boundaries over 2X the drive’s advertised capacity.
 
 

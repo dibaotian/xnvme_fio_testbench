@@ -1,0 +1,25 @@
+[global]
+ioengine=libaio
+direct=1
+# group_reporting
+filename=/dev/nvme0n1
+
+[sequential-fill]
+description=Sequential fill phase
+rw=write
+iodepth=16
+bs=1M
+numjobs=1
+size=90%
+write_bw_log=fioa_seqwrite-steady-state
+stonewall
+
+[random-write-steady]
+stonewall
+description=Random write steady state phase
+rw=randwrite
+bs=4K
+iodepth=32
+numjobs=4
+size=90%
+write_bw_log=fioa-randwrite_steady-state
