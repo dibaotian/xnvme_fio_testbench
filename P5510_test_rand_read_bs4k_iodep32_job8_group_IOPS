@@ -16,9 +16,11 @@ size=100%
 group_reporting=1
 # time_based
 # runtime=5
-ramp_time=30
+# ramp_time=30
+log_avg_msec=10000
+write_iops_log=iopslog_P5510_test_rand_read_bs4k_iodep32_job8_group.log
 
-[job1-4k-rand write]
+[job1-4k-rand read]
 rw=randread
 numjobs=8
 filename=/dev/nvme0n1

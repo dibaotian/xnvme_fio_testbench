@@ -21,6 +21,10 @@ if os.geteuid() != 0:
 # nvme format /dev/nvme0 -s 2 -n 1
 # subprocess.getoutput("nvme id-ctrl /dev/nvme0 -H | grep 'Format \|Crypto Erase\|Sanitize'")
 
+# NVME disk 读取和写入的基本单位不是比特（bit）或字节（byte）
+# 而是一个页（Page），新的数据写入需要先擦除（Erase），然后再写入（Program），擦除必须按照块（Block）为单位进行
+# format可以针对多命名空间或单个命名空间进行操作，sanitize是对整个命名空间操作
+
 # Sanitize主要包含两个阶段，向SSD发sanitize命令，后台异步执行擦除操作
 # 对应两个时间 completion of the Sanitize command(命令的完成)和completion of the sanitize operation(操作的完成)，命令的完成不代表操作的完成。
 # 对于用户而言，sanitize命令是在异步完成用户数据删除前返回完成，看到的执行时间相比format更短，format必须彻底删除数据后才返回完成
@@ -29,7 +33,7 @@ if os.geteuid() != 0:
 # Sanitize Status(SSTAT)字段记录最近一次完成的sanitize状态，0x101代表[2:0]中第0 bit置“1”，即说明最近一次sanitize执行成功。
 # Sanitize Command Dword 10 Information (SCDW10)字段代表完成Sanitize – Command Dword 10的操作类型，0x2即0x010b，完成的是Block Erase sanitize操作。
 
-subprocess.getoutput("nvme sanitize-log")
+# subprocess.getoutput("nvme sanitize-log")
 device = "/dev/nvme0n1"
 print("start to dd {}, it will take over 20 mins for 3.84T nvme disk , please wait".format(device))
 start = time.time()

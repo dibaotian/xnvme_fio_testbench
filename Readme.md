@@ -158,10 +158,12 @@ Here are basic steps to follow to get reliable data at the end:
 ##### Repeatability: Given the same set of inputs, the results should always be within the expected run-to-run variance.
 #####  SSD performance can change as the drive is being written, our Enterprise performance measurement focuses on the steady state performance region.
 
-##### 1. Purge: Regardless of what has been done previously to the SSD, a purge puts the drive in a known, fixed state that emulates the state in which the drive would be received from the manufacturer, the fresh-out-of-box (FOB) state.
+##### 1. Purge: Regardless of what has been done previously to the nvme, a purge puts the drive in a known, fixed state that emulates the state in which the drive would be received from the manufacturer, the fresh-out-of-box (FOB) state.
 ##### uses the secure erase or sanitize commands with NVME disk
 ##### place the sample SSD in an FOB state
 ##### secure erase or sanitize is not the same as format (format may or may not restore the SSD to the FOB state)
 ##### 2. Precondition: for workload-independent precondition, write the drive with 128KB sequential transfers aligned to 4K boundaries over 2X the drive’s advertised capacity.
+
+##### https://www.snia.org/forums/cmsi/programs/twg
 
 
