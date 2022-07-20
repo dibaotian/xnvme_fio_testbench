@@ -1,0 +1,62 @@
+# Latency
+# queue depth = 1
+# workers = 1	
+# block size  4K
+# iodepth  1
+# seq   read     write
+#       10us     13us   
+# rand  read     write
+#       82us     15us     	 
+
+[global]
+direct=1
+ioengine=libaio
+randrepeat=0
+norandommap
+refill_buffers
+bs=4k
+iodepth=1
+size=100%
+#group_reporting=1
+# time_based
+# runtime=5
+
+[job1 seq read]
+rw=read
+numjobs=1
+filename=/dev/nvme0n1
+log_avg_msec = 1000
+write_lat_log=latlog_xnvme_seq_r_bs4k_iodep1_job1
+write_bw_log=bwlog_xnvme_seq_r_bs4k_iodep1_job1
+write_iops_log=iolog_xnvme_seq_r_bs4k_iodep1_job1
+stonewall
+
+[job2 seq write]
+rw=write
+numjobs=1
+filename=/dev/nvme0n1
+log_avg_msec = 1000
+write_lat_log=latlog_p5510_seq_w_bs4k_iodep1_job1
+write_bw_log=bwlog_p5510_seq_w_bs4k_iodep1_job1
+write_iops_log=iolog_p5510_seq_w_bs4k_iodep1_job1
+stonewall
+
+[job3 rand read]
+rw=randread
+numjobs=1
+filename=/dev/nvme0n1
+log_avg_msec = 1000
+write_lat_log=latlog_p5510_rand_r_bs4k_iodep1_job1
+write_bw_log=bwlog_p5510_rand_r_bs4k_iodep1_job1
+write_iops_log=iolog_p5510_rand_r_bs4k_iodep1_job1
+stonewall
+
+[job4 rand write]
+rw=randwrite
+numjobs=1
+filename=/dev/nvme0n1
+log_avg_msec = 1000
+write_lat_log=latlog_p5510_rand_w_bs4k_iodep1_job1
+write_bw_log=bwlog_p5510_rand_w_bs4k_iodep1_job1
+write_iops_log=iolog_p5510_rand_w_bs4k_iodep1_job1
+stonewall

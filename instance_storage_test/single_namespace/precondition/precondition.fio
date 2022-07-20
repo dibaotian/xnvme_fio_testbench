@@ -1,0 +1,16 @@
+[global]
+direct=1
+ioengine=libaio
+randrepeat=0
+buffered=0
+norandommap
+refill_buffers
+bs=128k
+iodepth=16
+numjobs=1
+size=100%
+rw=write
+
+[nvme0n1 sequential-fill]
+rw=write
+filename=/dev/nvme0n1

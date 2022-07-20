@@ -1,0 +1,20 @@
+[global]
+direct=1
+ioengine=libaio
+randrepeat=0
+buffered=0
+norandommap
+refill_buffers
+bs=16k
+iodepth=16
+size=100%
+# group_reporting=1
+#time_based
+#runtime=5
+
+[job-4k-seq read]
+rw=read
+numjobs=1
+log_avg_msec=1000
+write_iops_log=bwlog_XNVME_seq_r_bs16k_iodep16_job1_bw
+filename=/dev/nvme0n1

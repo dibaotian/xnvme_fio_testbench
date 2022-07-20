@@ -1,0 +1,24 @@
+# seq_read_bs4k_iodep1-256
+[global]
+direct=1
+ioengine=libaio
+randrepeat=0
+buffered=0
+norandommap
+refill_buffers
+iodepth=1
+group_reporting=1
+size=100%
+log_avg_msec=1000
+# time_based
+# runtime=5
+# ramp_time=30
+
+[job2]
+bs=4k
+rw=write
+numjobs=2
+filename=/dev/nvme0n1
+write_iops_log=iopslog_xnvme_seq_w_bs4k_iodep1_job2
+write_bw_log=bwlog_xnvme_seq_w_bs4k_iodep1_job2
+stonewall

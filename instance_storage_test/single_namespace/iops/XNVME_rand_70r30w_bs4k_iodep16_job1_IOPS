@@ -1,0 +1,23 @@
+[global]
+direct=1
+ioengine=libaio
+randrepeat=0
+buffered=0
+norandommap
+refill_buffers
+bs=4k
+iodepth=16
+size=100%
+# time_based
+# runtime=5
+
+[job1]
+rw=randrw
+rwmixread=70
+rwmixwrite=30
+numjobs=1
+log_avg_msec=1000
+write_iops_log=iopslog_xnvme_rand_r70w30_bs4k_iodep16_job1
+write_bw_log=bwlog_xnvme_rand_r70w30_bs4k_iodep16_job1
+filename=/dev/nvme0n1
+stonewall

@@ -1,0 +1,20 @@
+[global]
+direct=1
+ioengine=libaio
+randrepeat=0
+buffered=0
+norandommap
+refill_buffers
+bs=128k
+iodepth=16
+numjobs=1
+size=100%
+rw=write
+# time_based
+# runtime=5
+
+[nvme0n1 sequential-fill]
+rw=write
+filename=/dev/nvme0n1
+write_bw_log=nvme0n1_seqwrite-steady-state
+write_iops_log=nvme0n1_seqwrite-steady-state

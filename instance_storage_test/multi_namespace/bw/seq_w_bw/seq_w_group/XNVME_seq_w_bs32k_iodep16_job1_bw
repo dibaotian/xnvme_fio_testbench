@@ -1,0 +1,162 @@
+[global]
+direct=1
+ioengine=libaio
+randrepeat=0
+buffered=0
+norandommap
+refill_buffers
+bs=32k
+iodepth=16
+size=100%
+# group_reporting=1
+#time_based
+#runtime=5
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme0n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme0n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme0n1
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme1n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme1n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme1n1
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme2n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme2n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme2n1
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme3n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme3n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme3n1
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme4n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme4n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme4n1
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme5n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme5n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme5n1
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme6n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme6n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme6n1
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme7n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme7n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme7n1
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme8n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme8n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme8n1
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme9n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme9n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme9n1
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme10n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme10n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme10n1
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme11n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme11n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme11n1
+
+
+
+
+
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme12n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme12n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme12n1
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme13n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme13n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme13n1
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme14n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme14n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme14n1
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme15n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme15n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme15n1
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme16n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme16n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme16n1
+
+[job-32k-seq read]
+rw=write
+numjobs=1
+log_avg_msec=1000
+write_bw_log=bwlog_xnvme_nvme17n1_seq_w_bs32k_iodep16_job1
+write_iops_log=iolog_xnvme_nvme17n1_seq_w_bs32k_iodep16_job1
+filename=/dev/nvme17n1

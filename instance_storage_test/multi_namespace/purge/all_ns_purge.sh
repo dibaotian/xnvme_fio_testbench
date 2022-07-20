@@ -1,0 +1,1 @@
+./purge.py -d /dev/nvme0n1 -d /dev/nvme1n1 -d /dev/nvme2n1 -d /dev/nvme3n1 -d /dev/nvme4n1 -d /dev/nvme5n1 -d /dev/nvme6n1 -d /dev/nvme7n1 -d /dev/nvme5n1 -d /dev/nvme6n1 -d /dev/nvme7n1 -d /dev/nvme8n1 -d /dev/nvme9n1 -d /dev/nvme10n1 -d /dev/nvme11n1 -d /dev/nvme12n1 -d /dev/nvme13n1 -d /dev/nvme14n1 -d /dev/nvme15n1 -d /dev/nvme16n1 -d /dev/nvme17n1
